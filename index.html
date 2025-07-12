@@ -176,6 +176,110 @@
             color: #9ca3af;
         }
 
+        /* Math Challenge Modal */
+        .math-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .math-modal.show {
+            display: flex;
+        }
+
+        .math-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 300px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .math-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 16px;
+        }
+
+        .math-question {
+            font-size: 24px;
+            font-weight: 700;
+            color: #3b82f6;
+            margin-bottom: 16px;
+        }
+
+        .math-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .math-input:focus {
+            border-color: #3b82f6;
+        }
+
+        .math-input.error {
+            border-color: #ef4444;
+            background-color: #fef2f2;
+        }
+
+        .math-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .math-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .math-btn.submit {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .math-btn.submit:hover {
+            background-color: #2563eb;
+        }
+
+        .math-btn.cancel {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+
+        .math-btn.cancel:hover {
+            background-color: #e5e7eb;
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: 8px;
+            display: none;
+        }
+
         /* Continue Button */
         .continue-btn {
             width: 100%;
@@ -243,18 +347,106 @@
         <button class="continue-btn" id="continueBtn" disabled>Continue</button>
     </div>
 
+    <!-- Math Challenge Modal -->
+    <div class="math-modal" id="mathModal">
+        <div class="math-content">
+            <h3 class="math-title">Verify you're human</h3>
+            <div class="math-question" id="mathQuestion">2 + 7 = ?</div>
+            <input type="number" class="math-input" id="mathInput" placeholder="Enter your answer">
+            <div class="error-message" id="errorMessage">Incorrect answer. Please try again.</div>
+            <div class="math-buttons">
+                <button class="math-btn cancel" id="cancelBtn">Cancel</button>
+                <button class="math-btn submit" id="submitBtn">Submit</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const checkbox = document.getElementById('humanCheck');
         const checkboxLabel = document.getElementById('checkboxLabel');
         const continueBtn = document.getElementById('continueBtn');
+        const mathModal = document.getElementById('mathModal');
+        const mathQuestion = document.getElementById('mathQuestion');
+        const mathInput = document.getElementById('mathInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        
         let isChecked = false;
         let isLoading = false;
+        let currentAnswer = 0;
+
+        // Math problems array
+        const mathProblems = [
+            { question: "2 + 7", answer: 9 },
+            { question: "3 + 9", answer: 12 },
+            { question: "5 + 4", answer: 9 },
+            { question: "8 + 6", answer: 14 },
+            { question: "7 + 3", answer: 10 },
+            { question: "4 + 8", answer: 12 },
+            { question: "9 + 2", answer: 11 },
+            { question: "6 + 5", answer: 11 },
+            { question: "1 + 9", answer: 10 },
+            { question: "3 + 6", answer: 9 }
+        ];
+
+        function getRandomMathProblem() {
+            const problem = mathProblems[Math.floor(Math.random() * mathProblems.length)];
+            return problem;
+        }
 
         // Handle checkbox click
         checkbox.addEventListener('click', function() {
             if (isLoading || isChecked) return;
             
-            // Start loading state
+            // Show math challenge
+            const problem = getRandomMathProblem();
+            mathQuestion.textContent = problem.question + " = ?";
+            currentAnswer = problem.answer;
+            mathInput.value = '';
+            mathInput.classList.remove('error');
+            errorMessage.style.display = 'none';
+            mathModal.classList.add('show');
+            mathInput.focus();
+        });
+
+        // Handle submit button
+        submitBtn.addEventListener('click', function() {
+            const userAnswer = parseInt(mathInput.value);
+            
+            if (userAnswer === currentAnswer) {
+                // Correct answer - start loading
+                mathModal.classList.remove('show');
+                startLoading();
+            } else {
+                // Wrong answer
+                mathInput.classList.add('error');
+                errorMessage.style.display = 'block';
+                mathInput.value = '';
+                mathInput.focus();
+            }
+        });
+
+        // Handle cancel button
+        cancelBtn.addEventListener('click', function() {
+            mathModal.classList.remove('show');
+        });
+
+        // Handle Enter key in math input
+        mathInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                submitBtn.click();
+            }
+        });
+
+        // Handle Escape key to close modal
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && mathModal.classList.contains('show')) {
+                mathModal.classList.remove('show');
+            }
+        });
+
+        function startLoading() {
             isLoading = true;
             checkbox.classList.add('loading');
             checkboxLabel.classList.add('disabled');
@@ -279,19 +471,13 @@
                 isLoading = false;
                 continueBtn.disabled = false;
             }, 2000);
-        });
+        }
 
         // Handle continue button click
         continueBtn.addEventListener('click', function() {
             if (isChecked) {
-                // Add a small delay to simulate processing
-                continueBtn.textContent = 'Redirecting...';
-                continueBtn.disabled = true;
-                
-                setTimeout(function() {
-                    // Redirect to request.html
-                    window.location.href = 'request.html';
-                }, 1000);
+                // Direct redirect without showing "Redirecting..."
+                window.location.href = 'request.html';
             }
         });
 
